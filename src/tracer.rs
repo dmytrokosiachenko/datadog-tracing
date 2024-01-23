@@ -9,14 +9,11 @@ use std::env;
 
 use opentelemetry::{global};
 use std::time::Duration;
-use opentelemetry::trace::{TraceError, TraceResult};
+use opentelemetry::trace::{TraceError};
 use opentelemetry_datadog::{DatadogPropagator};
 use opentelemetry_sdk::trace::{config, RandomIdGenerator, Sampler, Tracer};
-use tracing::Subscriber;
-use tracing_opentelemetry::{OpenTelemetryLayer, PreSampledTracer};
-use tracing_subscriber::registry::LookupSpan;
 
-pub fn build_tracer() -> Result<Tracer, TraceError> {
+pub fn build_tracer() -> anyhow::Result<Tracer> {
     let service_name = env::var("DD_SERVICE")
         .map_err(|_| <&str as Into<TraceError>>::into("missing DD_SERVICE"))?;
 
@@ -40,17 +37,8 @@ pub fn build_tracer() -> Result<Tracer, TraceError> {
         .with_trace_config(config()
             .with_sampler(Sampler::AlwaysOn)
             .with_id_generator(RandomIdGenerator::default()))
-        .install_batch(opentelemetry_sdk::runtime::Tokio);
+        .install_batch(opentelemetry_sdk::runtime::Tokio)?;
 
     global::set_text_map_propagator(DatadogPropagator::default());
-    tracer
-}
-
-pub fn build_layer<S>() -> TraceResult<OpenTelemetryLayer<S, Tracer>>
-    where
-        Tracer: opentelemetry::trace::Tracer + PreSampledTracer + 'static,
-        S: Subscriber + for<'span> LookupSpan<'span>,
-{
-    let tracer = build_tracer()?;
-    Ok(tracing_opentelemetry::layer().with_tracer(tracer))
+    Ok(tracer)
 }
