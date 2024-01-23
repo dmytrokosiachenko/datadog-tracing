@@ -11,11 +11,11 @@ use crate::shutdown::TracerShutdown;
 use crate::tracer;
 
 pub struct DatadogLayers<S: Subscriber + for<'a> LookupSpan<'a>> {
-    log_layer: Box<dyn Layer<S> + Send + Sync + 'static>,
-    telemetry_layer: Option<OpenTelemetryLayer<S, Tracer>>,
-    loglevel_layer: EnvFilter,
-    guard: tracing_appender::non_blocking::WorkerGuard,
-    trace_shutdown: TracerShutdown,
+    pub log_layer: Box<dyn Layer<S> + Send + Sync + 'static>,
+    pub telemetry_layer: Option<OpenTelemetryLayer<S, Tracer>>,
+    pub loglevel_layer: EnvFilter,
+    pub guard: tracing_appender::non_blocking::WorkerGuard,
+    pub trace_shutdown: TracerShutdown,
 
 }
 
