@@ -34,7 +34,7 @@ tracing = "^0.1"
 tracing-appender = "0.2"
 tracing-opentelemetry = "^0.22"
 tracing-serde = "^0.1"
-tracing-subscriber = { version = "^0.3", features = ["env-filter", "json"] }
+tracing-subscriber = { version = "^0.3", features = ["env-filter", "json",  "registry"] }
 anyhow = "1.0"
 
 [patch.crates-io]
