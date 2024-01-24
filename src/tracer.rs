@@ -5,16 +5,14 @@
 //!
 //! It also contains a convenience function to build a layer with the tracer.
 use std::env;
-
-
-use opentelemetry::{global};
 use std::time::Duration;
-use opentelemetry::trace::{TraceError, TraceResult};
-use opentelemetry_datadog::{DatadogPropagator};
+
+use opentelemetry::global;
+use opentelemetry::trace::TraceError;
+use opentelemetry_datadog::DatadogPropagator;
 use opentelemetry_sdk::trace::{config, RandomIdGenerator, Sampler, Tracer};
 
-
-pub fn build_tracer() -> anyhow::Result<TraceResult<Tracer>> {
+pub fn build_tracer() -> anyhow::Result<Tracer> {
     let service_name = env::var("DD_SERVICE")
         .map_err(|_| <&str as Into<TraceError>>::into("missing DD_SERVICE"))?;
 
@@ -38,7 +36,7 @@ pub fn build_tracer() -> anyhow::Result<TraceResult<Tracer>> {
         .with_trace_config(config()
             .with_sampler(Sampler::AlwaysOn)
             .with_id_generator(RandomIdGenerator::default()))
-        .install_batch(opentelemetry_sdk::runtime::Tokio);
+        .install_batch(opentelemetry_sdk::runtime::Tokio)?;
 
     global::set_text_map_propagator(DatadogPropagator::default());
     Ok(tracer)
